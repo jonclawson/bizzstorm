@@ -1,32 +1,77 @@
 import { Row, Col } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { useGetProductsQuery } from '../slices/productsApiSlice';
-import { Link } from 'react-router-dom';
-import Product from '../components/Product';
-import Loader from '../components/Loader';
-import Message from '../components/Message';
-import Paginate from '../components/Paginate';
-import ProductCarousel from '../components/ProductCarousel';
-import Meta from '../components/Meta';
+// import { useGetProductsQuery } from '../slices/productsApiSlice';
+import { useGetIdeasQuery } from '../slices/ideaApiSlice';
+import { useGetPlansQuery } from '../slices/planApiSlice';
+// import { Link } from 'react-router-dom';
+// import Product from '../components/Product';
+// import Loader from '../components/Loader';
+// import Message from '../components/Message';
+// import Paginate from '../components/Paginate';
+// import ProductCarousel from '../components/ProductCarousel';
+// import Meta from '../components/Meta';
+import IdeaForm from '../components/IdeaForm';
+import IdeaList from '../components/IdeaList';
+import PlanList from '../components/PlanList';
+import PlanForm from '../components/PlanForm';
+import { useSelector } from 'react-redux';
 
 const HomeScreen = () => {
-  const { pageNumber, keyword } = useParams();
 
-  const { data, isLoading, error } = useGetProductsQuery({
+  const { pageNumber, keyword } = useParams();
+  const { planIdeas } = useSelector((state) => state.planIdeas);
+
+  // const { data, isLoading, error } = useGetProductsQuery({
+  //   keyword,
+  //   pageNumber,
+  // });
+
+  const ideasResponse = useGetIdeasQuery({
     keyword,
     pageNumber,
   });
 
+
+  const planResponse = useGetPlansQuery({
+    keyword,
+    pageNumber,
+  });
+
+
+
   return (
     <>
-      {!keyword ? (
+    <Row>
+      <Col >
+        <IdeaForm props={ideasResponse} ></IdeaForm>
+        <IdeaList props={ideasResponse} > </IdeaList>
+      </Col>
+      {
+        planResponse?.data?.plans?.length || planIdeas?.length ?
+        (
+        <Col sm={6}>
+        {
+          planIdeas?.length ?
+          (<PlanForm props={planResponse}></PlanForm>)
+          : ''
+        }
+        {
+          !!planResponse?.data?.plans?.length && (<PlanList props={planResponse}  ></PlanList>)
+        }
+          
+        </Col>
+        ) : ''
+      }
+    </Row>
+      {/* {!keyword ? (
         <ProductCarousel />
       ) : (
         <Link to='/' className='btn btn-light mb-4'>
           Go Back
         </Link>
-      )}
-      {isLoading ? (
+      )} */}
+
+      {/* {isLoading ? (
         <Loader />
       ) : error ? (
         <Message variant='danger'>
@@ -49,7 +94,7 @@ const HomeScreen = () => {
             keyword={keyword ? keyword : ''}
           />
         </>
-      )}
+      )} */}
     </>
   );
 };

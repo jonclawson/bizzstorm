@@ -1,6 +1,7 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import generateToken from '../utils/generateToken.js';
 import User from '../models/userModel.js';
+import Group from '../models/groupModel.js';
 
 // @desc    Auth user & get token
 // @route   POST /api/users/auth
@@ -11,10 +12,16 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
+    if (!user.groups || user.groups.length == 0) {
+      const group = await Group.create({ name: 'group-' + user.name.replace(' ', '').toLowerCase()});
+      user.groups = [group];
+      user.save();
+    }
     generateToken(res, user._id);
 
     res.json({
       _id: user._id,
+      groups: user.groups,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
@@ -29,16 +36,19 @@ const authUser = asyncHandler(async (req, res) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, groups } = req.body;
 
   const userExists = await User.findOne({ email });
+
 
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
   }
 
+  const group = await Group.create({ name: 'group-' + name.replace(' ', '').toLowerCase()})
   const user = await User.create({
+    groups: [group],
     name,
     email,
     password,
@@ -49,6 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     res.status(201).json({
       _id: user._id,
+      groups: user.groups,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
@@ -79,6 +90,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   if (user) {
     res.json({
       _id: user._id,
+      groups: user.groups,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
@@ -96,6 +108,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
+    user.groups = req.body.groups || user.groups;
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
 
@@ -107,6 +120,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
     res.json({
       _id: updatedUser._id,
+      groups: updatedUser.groups,
       name: updatedUser.name,
       email: updatedUser.email,
       isAdmin: updatedUser.isAdmin,
@@ -164,6 +178,7 @@ const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
   if (user) {
+    user.groups = req.body.groups || user.groups;
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
     user.isAdmin = Boolean(req.body.isAdmin);
@@ -172,6 +187,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
     res.json({
       _id: updatedUser._id,
+      groups: updatedUser.groups,
       name: updatedUser.name,
       email: updatedUser.email,
       isAdmin: updatedUser.isAdmin,

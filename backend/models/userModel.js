@@ -3,6 +3,13 @@ import bcrypt from 'bcryptjs';
 
 const userSchema = mongoose.Schema(
   {
+    groups: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+        ref: 'Group',
+      }
+    ],
     name: {
       type: String,
       required: true,

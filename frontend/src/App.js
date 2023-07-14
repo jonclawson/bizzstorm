@@ -10,13 +10,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
+  const appName = "Bizstorm!"
   const dispatch = useDispatch();
 
   useEffect(() => {
     const expirationTime = localStorage.getItem('expirationTime');
     if (expirationTime) {
       const currentTime = new Date().getTime();
-
       if (currentTime > expirationTime) {
         dispatch(logout());
       }
@@ -26,13 +26,13 @@ const App = () => {
   return (
     <>
       <ToastContainer />
-      <Header />
+      <Header appName={appName}/>
       <main className='py-3'>
-        <Container>
+        <Container className="">
           <Outlet />
         </Container>
       </main>
-      <Footer />
+      <Footer appName={appName} />
     </>
   );
 };

@@ -8,6 +8,7 @@ import FormContainer from '../components/FormContainer';
 import { useRegisterMutation } from '../slices/usersApiSlice';
 import { setCredentials } from '../slices/authSlice';
 import { toast } from 'react-toastify';
+import { useCreateGroupMutation } from '../slices/groupApiSlice';
 
 const RegisterScreen = () => {
   const [name, setName] = useState('');
@@ -18,6 +19,7 @@ const RegisterScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [createGroup] = useCreateGroupMutation();
   const [register, { isLoading }] = useRegisterMutation();
 
   const { userInfo } = useSelector((state) => state.auth);
