@@ -1,9 +1,8 @@
 
-# Bizstorm
+# Bizstorm MERN App
 
 A business plan brainstorming application. Add ideas and create a business plan pdf.
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Built with Mongo, Express, React and Node. (MERN)
 
 ## Available Scripts
 
